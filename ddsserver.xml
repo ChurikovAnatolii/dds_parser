@@ -71,7 +71,7 @@
 		<n n="6" >
 			<n n="ID" v="6" />
 			<n n="Enable" v="1" />
-			<n n="DisplayName" v="IP 2 (Moxa 2)" />
+			<n n="DisplayName" v="IP 4 (Moxa 2)" />
 			<n n="DirectionType" v="1" />
 			<n n="ThroughputAlarmLevel" v="90" />
 			<n n="InactivityTimeOut" v="11000" />
@@ -152,7 +152,7 @@
 			<n n="Destination" >
 				<n n="0" >
 					<n n="Addr" v="239.20.20.2" />
-					<n n="Port" v="4103" />
+					<n n="Port" v="4109" />
 				</n>
 			</n>
 		</n>
@@ -196,7 +196,7 @@
 			<n n="Destination" >
 				<n n="0" >
 					<n n="Addr" v="239.20.20.1" />
-					<n n="Port" v="4105" />
+					<n n="Port" v="4106" />
 				</n>
 			</n>
 		</n>

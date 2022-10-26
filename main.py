@@ -6,6 +6,21 @@ tree = ET.parse('ddsserver.xml')
 root = tree.getroot()
 
 
+def prepare_channels_values(channel_dict):
+
+    def_dict_channels = {'ID': 0, 'Enable': 0, 'DisplayName': 'NULL', 'Description': "NULL", 'DirectionType': 1,
+                         'ThroughputAlarmLevel': 0, 'InactivityTimeOut': 0, 'ThroughputCapacityBPS': 0,
+                         'Type': "NULL", 'StreamFormat': "NULL", 'GroupID': 0, 'Mode': 0, 'LocalAddr': "NULL",
+                         'LocalPort': 0, 'TTL': 0, 'DestinationAddr': "NO", 'DestinationPort': "NULL",
+                         'IpStSourceName': "NULL", 'IpStMulticastAddr': "NULL", 'IpStInterfaces': "NULL",
+                         'DisableAlarm': "NULL", 'ReconnectTimeOut': "NULL", 'EnableKeepAlive': "TEXT",
+                         'KeepAliveTime': 0, 'KeepAliveInterval': 0, 'KeepAliveProbes': 0, 'FMTPLocalID': "NULL",
+                         'FMTPRemoteID': "NULL", 'Ti': 0, 'Tr': 0, 'Ts': 0}
+    for name in def_dict_channels.keys():
+        def_dict_channels[name] = channel_dict.get(name)
+    return def_dict_channels
+
+
 def channel_group_parse(type_of_group):  # function to parse channels group from file and return list with dictionary.
     channel_group_list = []  # In one  dict one channel group
     for child in root.findall("n"):
@@ -35,8 +50,7 @@ def channels_parse(type_of_group):  # function to parse channels group from file
                                 one_channel_dict["Destination" + child_5.get('n')] = child_5.get(
                                     "v")  # add Destinationaddr and port to dict.
                     one_channel_dict.pop('Destination', None)  # Delete Destination key
-                    channels_list.append(one_channel_dict)
-
+                    channels_list.append(prepare_channels_values(one_channel_dict))
     return channels_list
 
 
@@ -94,7 +108,7 @@ CREATE TABLE Channels(
 """
 
 
-def insert_query_to_base(query, value):  # Connect to base and execute query
+def call_procedure_in_base(query, value):  # Connect to base and call procedure to update or insert data
     try:
         cnx = mysql.connector.connect(user='root',
                                       password='root',
@@ -109,63 +123,60 @@ def insert_query_to_base(query, value):  # Connect to base and execute query
             print(err)
     else:
         cursor = cnx.cursor()
-        cursor.execute(query, value)
+        update_args = cursor.callproc(query, value)
         cnx.commit()
         cursor.close()
         cnx.close()
+        return update_args
 
 
-def insert_query(query):  # Connect to base and execute query
-    try:
-        cnx = mysql.connector.connect(user='root',
-                                      password='root',
-                                      database='base',
-                                      host='192.168.2.131')
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-    else:
-        cursor = cnx.cursor()
-        cursor.execute(query)
-        cnx.commit()
-        cursor.close()
-        cnx.close()
+def update_channel_group():
+    operations = 0
+    updates = 0
+    inserts = 0
+    print("Operations in ChannelGroups table")
+    for dict_for_sql in channel_group_parse('ChannelGroups'):  #
+        values = []
+        for value in dict_for_sql.values():
+            values.append(value)
+        if len(values) == 11:
+            values.insert(3, "None")
+        values.append(0)
+        check_update_insert = call_procedure_in_base('ImportDDSChanelGroups', values)
+        print("Operation {} executed with success".format(operations))
+        if check_update_insert[12] == 1:
+            inserts += 1
+        elif check_update_insert[12] == 2:
+            updates += 1
+        operations += 1
+    print("Execute {o} operations".format(o=operations))
+    print("Inserted {i} rows".format(i=inserts))
+    print("Updated {u} rows".format(u=updates))
 
 
-# Search in make_group_lst and insert to SQL
+def update_channels():
+    operations = 0
+    updates = 0
+    inserts = 0
+    print("Operations in Channels table")
+    for dict_for_sql in channels_parse('Channels'):
+        values = []
+        for value in dict_for_sql.values():
+            values.append(value)
+        values.append(0)
+        check_update_insert = call_procedure_in_base('ImportDDSChannels', values)
+        operations += 1
+        print("Operation {} executed with success".format(operations))
+        if check_update_insert[31] == 1:
+            inserts += 1
+        elif check_update_insert[31] == 2:
+            updates += 1
+    print("Execute {k} operations".format(k=operations))
+    print("Inserted {i} rows".format(i=inserts))
+    print("Updated {u} rows".format(u=updates))
 
 
-def xml_branch_to_sql(branch_name):
-    count = 0
-    if branch_name == "Channels":
-        for dict_for_sql in channels_parse(branch_name):
-            values = []
-            for value in dict_for_sql.values():
-                values.append(value)
-            placeholders = ', '.join(['%s'] * len(dict_for_sql))
-            columns = ', '.join(dict_for_sql.keys())
-            sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % (branch_name, columns, placeholders)
-            insert_query_to_base(sql, values)
-            count += 1
-        print("Added {k} rows".format(k=count))
-    elif branch_name == "ChannelGroups":
-        for dict_for_sql in channel_group_parse(branch_name):
-            values = []
-            for value in dict_for_sql.values():
-                values.append(value)
-            placeholders = ', '.join(['%s'] * len(dict_for_sql))
-            columns = ', '.join(dict_for_sql.keys())
-            sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % (branch_name, columns, placeholders)
-            insert_query_to_base(sql, values)
-            count += 1
-        print("Added {k} rows".format(k=count))
+# update_channel_group()
+update_channels()
 
 
-insert_query(channels_table_query)
-insert_query(channel_group_table_query)
-xml_branch_to_sql('ChannelGroups')
-xml_branch_to_sql("Channels")
