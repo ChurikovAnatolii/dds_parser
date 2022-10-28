@@ -1,51 +1,12 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <n ver="1.1" >
-	<n n="Channels">
-		<n n="1">
-			<n n="ID" v="1" />
-			<n n="Enable" v="1" />
-			<n n="DisplayName" v="IP 1 (Moxa 1)" />
-			<n n="Description" v="\x0A" />
-			<n n="DirectionType" v="1" />
-			<n n="ThroughputAlarmLevel" v="90" />
-			<n n="InactivityTimeOut" v="11000" />
-			<n n="ThroughputCapacityBPS" v="51200" />
-			<n n="Type" v="UDP" />
-			<n n="StreamFormat" v="DLECRC" />
-			<n n="GroupID" v="1" />
-			<n n="Mode" v="1" />
-			<n n="LocalAddr" v="10.10.1.255" />
-			<n n="LocalPort" v="0" />
-			<n n="TTL" v="0" />
-			<n n="Destination" >
-				<n n="0" >
-					<n n="Addr" v="239.20.20.1" />
-					<n n="Port" v="4101" />
-				</n>
-			</n>
-		</n>
-		<n n="4" >
-			<n n="ID" v="4" />
-			<n n="Enable" v="1" />
-			<n n="DisplayName" v="IP 1 (Moxa 2)" />
-			<n n="DirectionType" v="1" />
-			<n n="ThroughputAlarmLevel" v="90" />
-			<n n="InactivityTimeOut" v="11000" />
-			<n n="ThroughputCapacityBPS" v="51200" />
-			<n n="Type" v="UDP" />
-			<n n="StreamFormat" v="DLECRC" />
-			<n n="GroupID" v="1" />
-			<n n="Mode" v="1" />
-			<n n="LocalAddr" v="10.10.1.255" />
-			<n n="LocalPort" v="0" />
-			<n n="TTL" v="0" />
-			<n n="Destination" >
-				<n n="0" >
-					<n n="Addr" v="239.20.20.1" />
-					<n n="Port" v="4102" />
-				</n>
-			</n>
-		</n>
+	<n n="SavedTime" v="09/10/2022 17:17:29" />
+	<n n="EnableFSynchroSharing" v="1" />
+	<n n="SrvrChannel" v="Srvr_DDS" />
+	<n n="SrvrMulticastAddr" v="234.0.7.1" />
+	<n n="SrvrInterfaces" v="192.168.23.255\x00192.168.24.255\x00\x00" />
+	<n n="Channels" >
+
 		<n n="5" >
 			<n n="ID" v="5" />
 			<n n="Enable" v="1" />
@@ -71,7 +32,7 @@
 		<n n="6" >
 			<n n="ID" v="6" />
 			<n n="Enable" v="1" />
-			<n n="DisplayName" v="IP 4 (Moxa 2)" />
+			<n n="DisplayName" v="IP 2 (Moxa 2)" />
 			<n n="DirectionType" v="1" />
 			<n n="ThroughputAlarmLevel" v="90" />
 			<n n="InactivityTimeOut" v="11000" />
@@ -152,7 +113,7 @@
 			<n n="Destination" >
 				<n n="0" >
 					<n n="Addr" v="239.20.20.2" />
-					<n n="Port" v="4109" />
+					<n n="Port" v="4103" />
 				</n>
 			</n>
 		</n>
@@ -196,7 +157,7 @@
 			<n n="Destination" >
 				<n n="0" >
 					<n n="Addr" v="239.20.20.1" />
-					<n n="Port" v="4106" />
+					<n n="Port" v="4105" />
 				</n>
 			</n>
 		</n>

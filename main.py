@@ -108,6 +108,27 @@ CREATE TABLE Channels(
 """
 
 
+def call_del(query):  # Connect to base and call procedure to update or insert data
+    try:
+        cnx = mysql.connector.connect(user='root',
+                                      password='root',
+                                      database='base',
+                                      host='192.168.2.131')
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+    else:
+        cursor = cnx.cursor()
+        cursor.callproc(query)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+
 def call_procedure_in_base(query, value):  # Connect to base and call procedure to update or insert data
     try:
         cnx = mysql.connector.connect(user='root',
@@ -140,7 +161,7 @@ def update_channel_group():
         for value in dict_for_sql.values():
             values.append(value)
         if len(values) == 11:
-            values.insert(3, "None")
+            values.insert(3, "NULL")
         values.append(0)
         check_update_insert = call_procedure_in_base('ImportDDSChanelGroups', values)
         print("Operation {} executed with success".format(operations))
@@ -152,6 +173,8 @@ def update_channel_group():
     print("Execute {o} operations".format(o=operations))
     print("Inserted {i} rows".format(i=inserts))
     print("Updated {u} rows".format(u=updates))
+    args = (0, 0)
+    print(call_procedure_in_base("DeleteDDSChannelGroups", args))
 
 
 def update_channels():
@@ -174,9 +197,13 @@ def update_channels():
     print("Execute {k} operations".format(k=operations))
     print("Inserted {i} rows".format(i=inserts))
     print("Updated {u} rows".format(u=updates))
+    args = (1, 0)
+    print(call_procedure_in_base("DeleteDDSChannels", args))
 
 
-# update_channel_group()
 update_channels()
+
+update_channel_group()
+
 
 
